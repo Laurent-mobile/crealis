@@ -54,7 +54,7 @@ const authLimiter = rateLimit({
 const allowedOrigins = process.env.NODE_ENV === 'production'
   ? [
       'https://crealis-dashboard.vercel.app',  // Votre domaine Vercel
-      'https://votre-domaine.vercel.app'
+      'https://crealis-dashbord.vercel.app'
     ]
   : ['http://localhost:5173', 'http://localhost:3000', '*'];
 
