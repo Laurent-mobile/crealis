@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// URL dynamique selon l'environnement
+// 🔧 URL dynamique selon l'environnement
 const API_URL = import.meta.env.VITE_API_URL || 
   (window.location.hostname === 'localhost' 
     ? 'http://localhost:5000/api' 
@@ -28,7 +28,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Intercepteur pour gérer les erreurs
+// Intercepteur pour gérer les erreurs 401
 api.interceptors.response.use(
   (response) => response,
   (error) => {
