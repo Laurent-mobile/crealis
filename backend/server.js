@@ -1,10 +1,12 @@
-﻿//backend/server.js
-const express = require('express');
+﻿const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const dotenv = require('dotenv');
+const path = require('path');
+
+// Import des routes
 const authRoutes = require('./src/routes/auth.routes');
 const merchantRoutes = require('./src/routes/merchant.routes');
 const loyaltyRoutes = require('./src/routes/loyalty.routes');
@@ -19,7 +21,6 @@ const orderRoutes = require('./src/routes/order.routes');
 const categoryRoutes = require('./src/routes/category.routes');
 const settingsRoutes = require('./src/routes/settings.routes');
 const merchantDashboardRoutes = require('./src/routes/merchant-dashboard.routes');
-const path = require('path');
 const supplierRoutes = require('./src/routes/supplier.routes');
 const reportRoutes = require('./src/routes/report.routes');
 const merchantStockRoutes = require('./src/routes/merchant-stock.routes');
@@ -29,6 +30,7 @@ const notificationRoutes = require('./src/routes/notifications.routes');
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
+const isProd = process.env.NODE_ENV === 'production';
 
 // 🔒 SÉCURITÉ
 app.use(helmet({
@@ -38,32 +40,35 @@ app.use(helmet({
 // 🗜️ COMPRESSION
 app.use(compression());
 
-// ⚡ RATE LIMITING
+// ⚡ RATE LIMITING (Corrigé pour éviter l'erreur 429 sur le dashboard)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // max 100 requêtes par IP
+  max: isProd ? 300 : 2000, // 300 en prod, 2000 en dev (le dashboard fait ~10 requêtes au chargement)
   message: { error: 'Trop de requêtes, veuillez réessayer plus tard' }
 });
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5, // max 5 tentatives de login
+  max: 10, // 10 tentatives de login
   message: { error: 'Trop de tentatives de connexion' }
 });
 
 // 🌐 CORS configuré pour la production
-const allowedOrigins = process.env.NODE_ENV === 'production'
+const allowedOrigins = isProd
   ? [
-      'https://crealis-dashboard.vercel.app',  // Votre domaine Vercel
-      'https://crealis-dashbord.vercel.app'
+      'https://crealis-dashboard.vercel.app',
+      'https://crealis-dashbord.vercel.app' // Votre orthographe actuelle sur Vercel
     ]
-  : ['http://localhost:5173', 'http://localhost:3000', '*'];
+  : ['http://localhost:5173', 'http://localhost:3000'];
 
 app.use(cors({
   origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    // Autoriser les requêtes sans origine (ex: mobile, tests) ou celles dans la liste
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('CORS non autorisé'));
+      console.log('❌ Requête CORS bloquée pour:', origin);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
@@ -74,7 +79,7 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Appliquer le rate limiting sur les routes sensibles
+// Appliquer le rate limiting
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 app.use('/api/', limiter);
@@ -115,9 +120,7 @@ app.get('/api/health', (req, res) => {
 app.use((err, req, res, next) => {
   console.error('❌ Erreur globale:', err);
   res.status(err.status || 500).json({
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Erreur interne du serveur' 
-      : err.message
+    error: isProd ? 'Erreur interne du serveur' : err.message
   });
 });
 
