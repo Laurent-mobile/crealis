@@ -55,9 +55,9 @@ function Login() {
       <div className="login-card">
         <div className="login-header">
           <div className="login-logo">
-            <div className="logo-icon-large">🏪</div>
+            <img src="/src/assets/logo.jpg" alt="Créalis" className="logo-image-large" />
             <div className="logo-text-large">
-              <span className="logo-main">CREALIS - </span>
+              <span className="logo-main">CREALIS</span>
               <span className="logo-sub">DASSANDAGA</span>
             </div>
           </div>
