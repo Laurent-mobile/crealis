@@ -90,14 +90,14 @@ function MerchantDashboard() {
 
     if (loading) {
         return (
-            <Layout>
+            <>
                 <div className="spinner-container"><div className="spinner"></div></div>
-            </Layout>
+            </>
         );
     }
 
     return (
-        <Layout>
+        <>
             <div className="dashboard-container">
                 {/* En-tête personnalisé avec le nom du commerçant */}
                 <div className="dashboard-header">
@@ -246,7 +246,7 @@ function MerchantDashboard() {
                     </div>
                 </div>
             </div>
-        </Layout>
+        </>
     );
 }
 

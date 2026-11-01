@@ -199,9 +199,9 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <Layout>
+      <>
         <div className="spinner-container"><div className="spinner"></div></div>
-      </Layout>
+      </>
     )
   }
 
