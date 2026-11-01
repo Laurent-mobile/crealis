@@ -66,7 +66,7 @@ function Customers() {
     if (loading) return <div className="spinner-container"><div className="spinner"></div></div>
 
     return (
-        <Layout>
+        
             <div className="page-container">
                 <div className="page-header">
                     <h1 className="page-title">Gestion des Clients</h1>
@@ -217,7 +217,7 @@ function Customers() {
                     </div>
                 )}
             </div>
-        </Layout>
+        
     )
 }
 

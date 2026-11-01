@@ -141,16 +141,16 @@ function Transactions() {
 
   if (loading && transactions.length === 0) {
     return (
-      <Layout>
+      <>
         <div className="spinner-container">
           <div className="spinner"></div>
         </div>
-      </Layout>
+      </>
     )
   }
 
-  return (
-    <Layout>
+    return (
+    <>
       <div className="page-container">
         <div className="page-header">
           <div>
@@ -523,65 +523,59 @@ function Transactions() {
         .modal-lg {
           max-width: 700px;
         }
+        .product-detail-card {
+          display: flex;
+          gap: 20px;
+          background: var(--gray-50);
+          border-radius: 12px;
+          padding: 16px;
+          margin-top: 8px;
+        }
+        .product-image-container {
+          flex-shrink: 0;
+          width: 100px;
+          height: 100px;
+          border-radius: 10px;
+          overflow: hidden;
+          background: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid var(--gray-200);
+        }
+        .product-detail-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .product-info-container {
+          flex: 1;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+        .product-name {
+          font-weight: 600;
+          color: var(--gray-800);
+          font-size: 15px;
+        }
+        .product-price {
+          font-weight: 700;
+          color: var(--primary);
+          font-size: 16px;
+        }
+        @media (max-width: 600px) {
           .product-detail-card {
-  display: flex;
-  gap: 20px;
-  background: var(--gray-50);
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 8px;
-}
-
-.product-image-container {
-  flex-shrink: 0;
-  width: 100px;
-  height: 100px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--gray-200);
-}
-
-.product-detail-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.product-info-container {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.product-name {
-  font-weight: 600;
-  color: var(--gray-800);
-  font-size: 15px;
-}
-
-.product-price {
-  font-weight: 700;
-  color: var(--primary);
-  font-size: 16px;
-}
-
-@media (max-width: 600px) {
-  .product-detail-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .product-info-container {
-    grid-template-columns: 1fr;
-  }
-}
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .product-info-container {
+            grid-template-columns: 1fr;
+          }
+        }
       `}</style>
-    </Layout>
+    </>
   )
 }
 

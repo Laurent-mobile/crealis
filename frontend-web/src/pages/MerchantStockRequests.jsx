@@ -30,18 +30,12 @@ function MerchantStockRequests() {
         setLoading(true);
         try {
             if (activeTab === 'available') {
-                // Récupérer les produits de l'entrepôt
                 const warehouseResponse = await api.get('/warehouse/stock');
                 const warehouseStocks = warehouseResponse.data.stocks || [];
-
-                // Récupérer les produits du commerçant
                 const myProductsResponse = await api.get('/products');
                 const myProducts = myProductsResponse.data.products || [];
-
-                // Récupérer les IDs des produits que le commerçant possède déjà
                 const myProductIds = new Set(myProducts.map(p => p.id));
 
-                // Filtrer pour ne montrer que les produits NON possédés par le commerçant
                 const available = warehouseStocks
                     .filter(s => !myProductIds.has(s.productId) && s.quantity > 0)
                     .map(s => ({
@@ -57,8 +51,7 @@ function MerchantStockRequests() {
                 setAvailableProducts(available);
             } else if (activeTab === 'myStock') {
                 const response = await api.get('/products');
-                const products = response.data.products || [];
-                setMyStock(products);
+                setMyStock(response.data.products || []);
             } else if (activeTab === 'requests') {
                 const response = await api.get('/merchant-stock/requests');
                 setRequests(response.data || []);
@@ -129,14 +122,6 @@ function MerchantStockRequests() {
         return <span className={`badge ${s.class}`}>{s.icon} {s.label}</span>;
     };
 
-    const getSourceTypeLabel = (sourceType) => {
-        switch (sourceType) {
-            case 'direct': return 'Approvisionnement direct';
-            case 'request': return 'Demande de réapprovisionnement';
-            default: return sourceType;
-        }
-    };
-
     if (loading) {
         return (
             <Layout>
@@ -145,6 +130,7 @@ function MerchantStockRequests() {
         );
     }
 
+    // ✅ CORRECTION ICI : Ajout des balises <Layout> et </Layout> qui manquaient
     return (
         <Layout>
             <div className="page-container">
@@ -155,46 +141,27 @@ function MerchantStockRequests() {
                     </div>
                 </div>
 
-                {/* Onglets */}
                 <div className="stock-tabs">
-                    <button
-                        className={`tab-btn ${activeTab === 'available' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('available')}
-                    >
-                        <span className="tab-icon">🏭</span>
-                        <span>Disponible à l'entrepôt</span>
+                    <button className={`tab-btn ${activeTab === 'available' ? 'active' : ''}`} onClick={() => setActiveTab('available')}>
+                        <span className="tab-icon">🏭</span><span>Disponible à l'entrepôt</span>
                     </button>
-                    <button
-                        className={`tab-btn ${activeTab === 'myStock' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('myStock')}
-                    >
-                        <span className="tab-icon">📦</span>
-                        <span>Mon stock actuel</span>
+                    <button className={`tab-btn ${activeTab === 'myStock' ? 'active' : ''}`} onClick={() => setActiveTab('myStock')}>
+                        <span className="tab-icon">📦</span><span>Mon stock actuel</span>
                     </button>
-                    <button
-                        className={`tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('requests')}
-                    >
-                        <span className="tab-icon">📋</span>
-                        <span>Mes demandes</span>
+                    <button className={`tab-btn ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => setActiveTab('requests')}>
+                        <span className="tab-icon">📋</span><span>Mes demandes</span>
                     </button>
-                    <button
-                        className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('history')}
-                    >
-                        <span className="tab-icon">📜</span>
-                        <span>Historique</span>
+                    <button className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
+                        <span className="tab-icon">📜</span><span>Historique</span>
                     </button>
                 </div>
 
-                {/* Produits disponibles à l'entrepôt */}
                 {activeTab === 'available' && (
                     <div className="available-products">
                         <div className="info-box">
                             <span className="info-icon">ℹ️</span>
                             <span>Produits disponibles dans l'entrepôt central. Faites une demande pour réapprovisionner votre boutique.</span>
                         </div>
-
                         <div className="products-grid">
                             {availableProducts.length === 0 ? (
                                 <div className="empty-state">
@@ -220,14 +187,7 @@ function MerchantStockRequests() {
                                                 </span>
                                             </div>
                                         </div>
-                                        <button
-                                            className="btn btn-primary"
-                                            onClick={() => {
-                                                setSelectedProduct(product);
-                                                setRequestQuantity(1);
-                                                setShowRequestModal(true);
-                                            }}
-                                        >
+                                        <button className="btn btn-primary" onClick={() => { setSelectedProduct(product); setRequestQuantity(1); setShowRequestModal(true); }}>
                                             📦 Demander
                                         </button>
                                     </div>
@@ -237,7 +197,6 @@ function MerchantStockRequests() {
                     </div>
                 )}
 
-                {/* Mon stock actuel */}
                 {activeTab === 'myStock' && (
                     <div className="my-stock">
                         <div className="stats-grid-mini">
@@ -246,15 +205,11 @@ function MerchantStockRequests() {
                                 <div className="stat-label">Produits</div>
                             </div>
                             <div className="stat-card-mini">
-                                <div className="stat-value">
-                                    {myStock.reduce((sum, p) => sum + (p.stock || 0), 0).toLocaleString()}
-                                </div>
+                                <div className="stat-value">{myStock.reduce((sum, p) => sum + (p.stock || 0), 0).toLocaleString()}</div>
                                 <div className="stat-label">Unités totales</div>
                             </div>
                             <div className="stat-card-mini">
-                                <div className="stat-value">
-                                    {myStock.filter(p => (p.stock || 0) <= (p.minStockAlert || 10)).length}
-                                </div>
+                                <div className="stat-value">{myStock.filter(p => (p.stock || 0) <= (p.minStockAlert || 10)).length}</div>
                                 <div className="stat-label">Stock faible</div>
                             </div>
                         </div>
@@ -269,11 +224,7 @@ function MerchantStockRequests() {
                             </div>
                             <div className="summary-item">
                                 <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        checked={showLowStockOnly}
-                                        onChange={(e) => setShowLowStockOnly(e.target.checked)}
-                                    />
+                                    <input type="checkbox" checked={showLowStockOnly} onChange={(e) => setShowLowStockOnly(e.target.checked)} />
                                     <span>⚠️ Afficher uniquement les produits en stock faible</span>
                                 </label>
                             </div>
@@ -292,9 +243,7 @@ function MerchantStockRequests() {
                                 </thead>
                                 <tbody>
                                     {filteredMyStock.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="6" className="text-center">Aucun produit dans votre inventaire</td>
-                                        </tr>
+                                        <tr><td colSpan="6" className="text-center">Aucun produit dans votre inventaire</td></tr>
                                     ) : (
                                         filteredMyStock.map((product) => (
                                             <tr key={product.id}>
@@ -319,18 +268,11 @@ function MerchantStockRequests() {
                                                     )}
                                                 </td>
                                                 <td>
-                                                    <button
-                                                        className="btn btn-sm btn-outline"
-                                                        onClick={() => {
-                                                            setSelectedProduct({
-                                                                id: product.product_id || product.id,
-                                                                name: product.name,
-                                                                availableStock: 1000
-                                                            });
-                                                            setRequestQuantity(product.reorderQuantity || 50);
-                                                            setShowRequestModal(true);
-                                                        }}
-                                                    >
+                                                    <button className="btn btn-sm btn-outline" onClick={() => {
+                                                        setSelectedProduct({ id: product.product_id || product.id, name: product.name, availableStock: 1000 });
+                                                        setRequestQuantity(product.reorderQuantity || 50);
+                                                        setShowRequestModal(true);
+                                                    }}>
                                                         📦 Réapprovisionner
                                                     </button>
                                                 </td>
@@ -343,7 +285,6 @@ function MerchantStockRequests() {
                     </div>
                 )}
 
-                {/* Mes demandes */}
                 {activeTab === 'requests' && (
                     <div className="my-requests">
                         <div className="table-container">
@@ -360,9 +301,7 @@ function MerchantStockRequests() {
                                 </thead>
                                 <tbody>
                                     {requests.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="6" className="text-center">Aucune demande de réapprovisionnement</td>
-                                        </tr>
+                                        <tr><td colSpan="6" className="text-center">Aucune demande de réapprovisionnement</td></tr>
                                     ) : (
                                         requests.map((request) => (
                                             <tr key={request.id}>
@@ -373,22 +312,13 @@ function MerchantStockRequests() {
                                                 <td>{request.note || '-'}</td>
                                                 <td>
                                                     {request.status === 'shipped' && (
-                                                        <button
-                                                            className="btn btn-sm btn-success"
-                                                            onClick={() => handleReceiveTransfer(request.id)}
-                                                        >
+                                                        <button className="btn btn-sm btn-success" onClick={() => handleReceiveTransfer(request.id)}>
                                                             ✅ Confirmer réception
                                                         </button>
                                                     )}
-                                                    {request.status === 'received' && (
-                                                        <span className="badge badge-success">✓ Reçu</span>
-                                                    )}
-                                                    {request.status === 'pending' && (
-                                                        <span className="badge badge-warning">En attente</span>
-                                                    )}
-                                                    {request.status === 'approved' && (
-                                                        <span className="badge badge-info">Approuvée</span>
-                                                    )}
+                                                    {request.status === 'received' && <span className="badge badge-success">✓ Reçu</span>}
+                                                    {request.status === 'pending' && <span className="badge badge-warning">En attente</span>}
+                                                    {request.status === 'approved' && <span className="badge badge-info">Approuvée</span>}
                                                 </td>
                                             </tr>
                                         ))
@@ -399,7 +329,6 @@ function MerchantStockRequests() {
                     </div>
                 )}
 
-                {/* Historique des réapprovisionnements */}
                 {activeTab === 'history' && (
                     <div className="supply-history">
                         <div className="info-box">
@@ -421,9 +350,7 @@ function MerchantStockRequests() {
                                 </thead>
                                 <tbody>
                                     {supplyHistory.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="7" className="text-center">Aucun historique de réapprovisionnement</td>
-                                        </tr>
+                                        <tr><td colSpan="7" className="text-center">Aucun historique de réapprovisionnement</td></tr>
                                     ) : (
                                         supplyHistory.map((record) => (
                                             <tr key={record.id}>
@@ -447,7 +374,6 @@ function MerchantStockRequests() {
                     </div>
                 )}
 
-                {/* Modal de demande */}
                 {showRequestModal && selectedProduct && (
                     <div className="modal-overlay" onClick={() => setShowRequestModal(false)}>
                         <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -468,7 +394,6 @@ function MerchantStockRequests() {
                                         </span>
                                     </div>
                                 </div>
-
                                 <div className="form-group">
                                     <label className="form-label">Quantité demandée *</label>
                                     <input
@@ -479,11 +404,8 @@ function MerchantStockRequests() {
                                         min="1"
                                         max={selectedProduct.availableStock}
                                     />
-                                    <small className="form-hint">
-                                        Maximum: {selectedProduct.availableStock} unités
-                                    </small>
+                                    <small className="form-hint">Maximum: {selectedProduct.availableStock} unités</small>
                                 </div>
-
                                 <div className="form-group">
                                     <label className="form-label">Note (optionnel)</label>
                                     <textarea
@@ -494,7 +416,6 @@ function MerchantStockRequests() {
                                         placeholder="Ajoutez une note pour l'entrepôt..."
                                     />
                                 </div>
-
                                 <div className="info-box">
                                     <span className="info-icon">📋</span>
                                     <span>Votre demande sera traitée par l'entrepôt. Vous serez notifié dès que le stock sera expédié.</span>
@@ -502,11 +423,7 @@ function MerchantStockRequests() {
                             </div>
                             <div className="modal-footer">
                                 <button className="btn btn-outline" onClick={() => setShowRequestModal(false)}>Annuler</button>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={handleRequestStock}
-                                    disabled={submitting}
-                                >
+                                <button className="btn btn-primary" onClick={handleRequestStock} disabled={submitting}>
                                     {submitting ? 'Envoi en cours...' : 'Envoyer la demande'}
                                 </button>
                             </div>
@@ -516,205 +433,44 @@ function MerchantStockRequests() {
             </div>
 
             <style>{`
-                .stock-tabs {
-                    display: flex;
-                    gap: 10px;
-                    margin-bottom: 24px;
-                    border-bottom: 1px solid var(--gray-200);
-                    padding-bottom: 12px;
-                }
-                .stock-tabs .tab-btn {
-                    padding: 8px 20px;
-                    background: none;
-                    border: none;
-                    font-size: 14px;
-                    font-weight: 500;
-                    color: var(--gray-600);
-                    cursor: pointer;
-                    border-radius: 20px;
-                    transition: all 0.2s;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-                .stock-tabs .tab-btn:hover {
-                    background: var(--gray-100);
-                    color: var(--primary);
-                }
-                .stock-tabs .tab-btn.active {
-                    background: var(--primary);
-                    color: white;
-                }
-                .products-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                    gap: 20px;
-                    margin-top: 20px;
-                }
-                .stock-product-card {
-                    background: white;
-                    border-radius: 12px;
-                    padding: 16px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-                    transition: transform 0.2s, box-shadow 0.2s;
-                }
-                .stock-product-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-                }
-                .stock-product-card .product-image {
-                    width: 100%;
-                    height: 150px;
-                    background: var(--gray-100);
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-bottom: 12px;
-                }
-                .stock-product-card .product-img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    border-radius: 8px;
-                }
-                .stock-product-card .product-image-placeholder {
-                    font-size: 48px;
-                }
-                .stock-product-card .product-info {
-                    margin-bottom: 12px;
-                }
-                .stock-product-card .product-name {
-                    font-size: 16px;
-                    font-weight: 600;
-                    margin-bottom: 4px;
-                }
-                .stock-product-card .product-price {
-                    color: var(--primary);
-                    font-weight: 600;
-                    margin-bottom: 8px;
-                }
-                .stock-badge {
-                    display: inline-block;
-                    padding: 4px 8px;
-                    border-radius: 20px;
-                    font-size: 12px;
-                    font-weight: 500;
-                }
+                .stock-tabs { display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--gray-200); padding-bottom: 12px; }
+                .stock-tabs .tab-btn { padding: 8px 20px; background: none; border: none; font-size: 14px; font-weight: 500; color: var(--gray-600); cursor: pointer; border-radius: 20px; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+                .stock-tabs .tab-btn:hover { background: var(--gray-100); color: var(--primary); }
+                .stock-tabs .tab-btn.active { background: var(--primary); color: white; }
+                .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+                .stock-product-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; }
+                .stock-product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+                .stock-product-card .product-image { width: 100%; height: 150px; background: var(--gray-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+                .stock-product-card .product-img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+                .stock-product-card .product-image-placeholder { font-size: 48px; }
+                .stock-product-card .product-info { margin-bottom: 12px; }
+                .stock-product-card .product-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+                .stock-product-card .product-price { color: var(--primary); font-weight: 600; margin-bottom: 8px; }
+                .stock-badge { display: inline-block; padding: 4px 8px; border-radius: 20px; font-size: 12px; font-weight: 500; }
                 .stock-badge.high { background: #d1fae5; color: #065f46; }
                 .stock-badge.medium { background: #fed7aa; color: #92400e; }
                 .stock-badge.low { background: #fee2e2; color: #991b1b; }
-                .stats-grid-mini {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 16px;
-                    margin-bottom: 24px;
-                }
-                .stat-card-mini {
-                    background: white;
-                    border-radius: 12px;
-                    padding: 16px;
-                    text-align: center;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                }
-                .stat-card-mini .stat-value {
-                    font-size: 28px;
-                    font-weight: bold;
-                    color: var(--primary);
-                }
-                .stat-card-mini .stat-label {
-                    font-size: 12px;
-                    color: var(--gray-500);
-                    margin-top: 4px;
-                }
-                .stock-summary {
-                    background: white;
-                    border-radius: 12px;
-                    padding: 16px;
-                    margin-bottom: 20px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    gap: 16px;
-                }
-                .summary-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-                .summary-label {
-                    font-size: 13px;
-                    color: var(--gray-600);
-                }
-                .summary-value {
-                    font-size: 16px;
-                    font-weight: 600;
-                    color: var(--gray-800);
-                }
-                .product-cell {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-                .product-icon {
-                    font-size: 20px;
-                }
-                .text-warning {
-                    color: var(--warning);
-                    font-weight: 600;
-                }
-                .text-success {
-                    color: #10b981;
-                    font-weight: 600;
-                }
-                .text-primary {
-                    color: #2563eb;
-                    font-weight: 600;
-                }
-                .text-center {
-                    text-align: center;
-                }
-                .request-product-info {
-                    background: var(--gray-50);
-                    padding: 12px;
-                    border-radius: 8px;
-                    margin-bottom: 16px;
-                }
-                .product-detail {
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 8px 0;
-                    border-bottom: 1px solid var(--gray-200);
-                }
-                .product-detail:last-child {
-                    border-bottom: none;
-                }
-                .product-detail .label {
-                    font-weight: 500;
-                    color: var(--gray-600);
-                }
-                .product-detail .value {
-                    font-weight: 600;
-                    color: var(--gray-800);
-                }
-                .info-box {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    background: #e0e7ff;
-                    padding: 12px;
-                    border-radius: 8px;
-                    margin-top: 16px;
-                    font-size: 13px;
-                    color: #1e40af;
-                }
-                .checkbox-label {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    cursor: pointer;
-                }
+                .stats-grid-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+                .stat-card-mini { background: white; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+                .stat-card-mini .stat-value { font-size: 28px; font-weight: bold; color: var(--primary); }
+                .stat-card-mini .stat-label { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+                .stock-summary { background: white; border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+                .summary-item { display: flex; align-items: center; gap: 8px; }
+                .summary-label { font-size: 13px; color: var(--gray-600); }
+                .summary-value { font-size: 16px; font-weight: 600; color: var(--gray-800); }
+                .product-cell { display: flex; align-items: center; gap: 8px; }
+                .product-icon { font-size: 20px; }
+                .text-warning { color: var(--warning); font-weight: 600; }
+                .text-success { color: #10b981; font-weight: 600; }
+                .text-primary { color: #2563eb; font-weight: 600; }
+                .text-center { text-align: center; }
+                .request-product-info { background: var(--gray-50); padding: 12px; border-radius: 8px; margin-bottom: 16px; }
+                .product-detail { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-200); }
+                .product-detail:last-child { border-bottom: none; }
+                .product-detail .label { font-weight: 500; color: var(--gray-600); }
+                .product-detail .value { font-weight: 600; color: var(--gray-800); }
+                .info-box { display: flex; align-items: center; gap: 12px; background: #e0e7ff; padding: 12px; border-radius: 8px; margin-top: 16px; font-size: 13px; color: #1e40af; }
+                .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
             `}</style>
         </Layout>
     );

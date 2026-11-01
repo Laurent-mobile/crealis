@@ -232,7 +232,7 @@ function Warehouse() {
     }
 
     return (
-        <Layout>
+        
             <div className="warehouse-container">
                 {/* En-tête */}
                 <div className="page-header">
@@ -718,7 +718,7 @@ function Warehouse() {
                     </div>
                 )}
             </div>
-        </Layout>
+        
     )
 }
 

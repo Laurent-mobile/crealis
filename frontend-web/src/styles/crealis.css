@@ -160,6 +160,7 @@ body {
 .main-content {
     margin-left: 260px;
     min-height: 100vh;
+    padding: 24px;
 }
 
 /* ==================== NAVBAR ==================== */

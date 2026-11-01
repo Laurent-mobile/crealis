@@ -375,8 +375,8 @@ function MerchantReports() {
         );
     }
 
-    return (
-        <Layout>
+        return (
+        <>
             <div className="reports-container">
                 <div className="page-header">
                     <div>
@@ -699,7 +699,7 @@ function MerchantReports() {
                     }
                 }
             `}</style>
-        </Layout>
+        </>
     );
 }
 

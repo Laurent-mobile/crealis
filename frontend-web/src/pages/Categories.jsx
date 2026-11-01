@@ -98,14 +98,14 @@ function Categories() {
 
     if (loading) {
         return (
-            <Layout>
+            <>
                 <div className="spinner-container"><div className="spinner"></div></div>
-            </Layout>
+            </>
         );
     }
 
     return (
-        <Layout>
+        
             <div className="page-container">
                 <div className="page-header">
                     <div>
@@ -212,7 +212,7 @@ function Categories() {
                     </div>
                 )}
             </div>
-        </Layout>
+        
     );
 }
 

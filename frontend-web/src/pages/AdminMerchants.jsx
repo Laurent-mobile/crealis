@@ -346,14 +346,14 @@ function AdminMerchants() {
 
     if (loading) {
         return (
-            <Layout>
+             <>
                 <div className="spinner-container"><div className="spinner"></div></div>
-            </Layout>
+            </>
         );
     }
 
-    return (
-        <Layout>
+        return (
+        <>
             <div className="page-container">
                 <div className="page-header">
                     <div>
@@ -610,7 +610,7 @@ function AdminMerchants() {
                     </div>
                 )}
 
-                {/* Modal Carte - CORRIGÉ */}
+                {/* Modal Carte */}
                 {showMapModal && (
                     <div className="modal-overlay" onClick={() => setShowMapModal(false)}>
                         <div className="modal modal-lg map-modal" onClick={(e) => e.stopPropagation()}>
@@ -1125,7 +1125,7 @@ function AdminMerchants() {
                     }
                 }
             `}</style>
-        </Layout>
+        </>
     );
 }
 

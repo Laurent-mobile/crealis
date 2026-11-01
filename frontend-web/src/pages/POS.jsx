@@ -209,7 +209,7 @@ function POS() {
     }
 
     return (
-        <Layout>
+        
             <div className="page-container">
                 <div className="page-header">
                     <div>
@@ -461,7 +461,7 @@ function POS() {
                     </div>
                 )}
             </div>
-        </Layout>
+        
     )
 }
 

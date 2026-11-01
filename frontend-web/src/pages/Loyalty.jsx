@@ -199,7 +199,7 @@ function Loyalty() {
   }
 
   return (
-    <Layout>
+    
       <div className="loyalty-container">
         {/* En-tête */}
         <div className="page-header">
@@ -748,7 +748,7 @@ function Loyalty() {
           </div>
         )}
       </div>
-    </Layout>
+    
   )
 }
 

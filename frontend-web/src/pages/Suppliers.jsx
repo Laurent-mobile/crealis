@@ -101,7 +101,7 @@ function Suppliers() {
     }
 
     return (
-        <Layout>
+        
             <div className="page-container">
                 <div className="page-header">
                     <div>
@@ -301,7 +301,7 @@ function Suppliers() {
                     </div>
                 )}
             </div>
-        </Layout>
+        
     )
 }
 

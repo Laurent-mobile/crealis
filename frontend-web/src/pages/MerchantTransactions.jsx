@@ -30,7 +30,7 @@ function MerchantTransactions() {
     };
 
     return (
-        <Layout>
+        
             <div className="page-container">
                 <div className="page-header">
                     <h1 className="page-title">💰 Mes Transactions</h1>
@@ -73,7 +73,7 @@ function MerchantTransactions() {
                     </table>
                 </div>
             </div>
-        </Layout>
+        
     );
 }
 

@@ -224,7 +224,7 @@ function Settings() {
     ]
 
     return (
-        <Layout>
+        
             <div className="settings-container-modern">
                 {/* En-tête */}
                 <div className="page-header">
@@ -1007,7 +1007,7 @@ function Settings() {
                     </div>
                 </div>
             </div>
-        </Layout>
+        
     )
 }
 

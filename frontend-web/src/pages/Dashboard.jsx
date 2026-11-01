@@ -206,7 +206,7 @@ function Dashboard() {
   }
 
   return (
-    <Layout>
+    
       <div className="dashboard-container">
         {/* En-tête */}
         <div className="dashboard-header">
@@ -389,7 +389,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    </Layout>
+    
   )
 }
 

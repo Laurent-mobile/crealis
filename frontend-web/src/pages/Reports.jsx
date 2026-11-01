@@ -120,7 +120,7 @@ function Reports() {
     const selectedReport = reportTypes.find(r => r.id === reportType)
 
     return (
-        <Layout>
+        
             <div className="reports-container">
                 <div className="page-header">
                     <div className="page-header-content">
@@ -287,7 +287,7 @@ function Reports() {
                     </div>
                 </div>
             </div>
-        </Layout>
+        
     )
 }
 
