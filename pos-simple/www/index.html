@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CREALIS POS Z108</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- LOGIN -->
+        <div id="login-screen" class="screen active">
+            <div class="login-container">
+                <div class="pos-brand">
+                    <div class="brand-icon">🏪</div>
+                    <h1>CREALIS POS</h1>
+                    <p>Terminal Z108</p>
+                </div>
+                <div class="login-form">
+                    <input type="text" id="merchant-code" placeholder="Code commerçant" class="pos-input">
+                    <input type="password" id="pos-pin" placeholder="Code PIN" class="pos-input">
+                    <button id="login-btn" class="pos-btn">🔓 DÉMARRER</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAISSE -->
+        <div id="cashier-screen" class="screen">
+            <div class="pos-header">
+                <span id="merchant-name">Chargement...</span>
+                <span id="current-time">--:--</span>
+            </div>
+
+            <div class="cashier-layout">
+                <!-- Produits -->
+                <div class="products-panel">
+                    <input type="text" id="product-search" class="search-box" placeholder="🔍 Rechercher un produit...">
+                    <div id="products-container"></div>
+                </div>
+
+                <!-- Panier -->
+                <div class="cart-panel">
+                    <div class="cart-header">
+                        <h3>🛒 Panier</h3>
+                        <span id="item-count" class="cart-badge">0</span>
+                    </div>
+                    <div id="cart-items" class="cart-items-container"></div>
+                    <div class="cart-summary">
+                        <div class="cart-total-row">
+                            <span>TOTAL</span>
+                            <span id="cart-total-amount" style="color:#2563eb;">0 FCFA</span>
+                        </div>
+                        <button id="checkout-btn" class="checkout-btn">💳 PAYER</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

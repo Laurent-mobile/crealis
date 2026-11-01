@@ -1,0 +1,19 @@
+﻿//backend/src/middleware/auth.js
+const jwt = require('jsonwebtoken');
+
+module.exports = (req, res, next) => {
+  const token = req.header('x-auth-token') || req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ message: 'No token, authorisation réfuser' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    req.merchantId = decoded.merchantId;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Token nest pas valide' });
+  }
+};

@@ -1,0 +1,3 @@
+id,sender_user_id,merchant_id,amount,currency,method,status,reference,created_at
+txn_2ada23512b614c72ba844fc76f99bcd2,usr_8bc2f7ea71d947748da4d815bde1b269,mch_dd31c9fe8ff144acb0d18e884d9984f4,2500,XOF,qr,success,TEST-QR-001,2026-05-28 17:06:17.073859
+txn_3ad5c20161064b47ac3e14ee4b01794a,usr_8bc2f7ea71d947748da4d815bde1b269,mch_dd31c9fe8ff144acb0d18e884d9984f4,2500,XOF,qr,success,QR-SCAN-1779994420629,2026-05-28 18:53:40.687691

@@ -1,0 +1,35 @@
+# Dépendances
+node_modules/
+.pnp
+.pnp.js
+
+# Fichiers d'environnement (NE JAMAIS POUSSER CES FICHIERS)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Fichiers de build
+dist/
+build/
+.expo/
+.expo-shared/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Uploads (si vous avez des fichiers locaux)
+backend/uploads/

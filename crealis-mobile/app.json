@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "crealis-mobile",
+    "slug": "crealis-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "CREALIS utilise votre position pour vous trouver les commerçants partenaires à proximité.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "CREALIS utilise votre position pour vous trouver les commerçants partenaires à proximité."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.laurent01.crealismobile"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "CREALIS utilise votre position pour vous trouver les commerçants partenaires à proximité."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "aa44e7d5-a0d9-49ed-bc69-14d81622c7db"
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+﻿version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: crealis_postgres
+    environment:
+      POSTGRES_DB: crealis_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - crealis_network
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: crealis_backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: crealis_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - crealis_network
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ../frontend-web
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: crealis_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - crealis_network
+    volumes:
+      - ../frontend-web:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+
+networks:
+  crealis_network:
+    driver: bridge

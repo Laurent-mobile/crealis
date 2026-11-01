@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>CREALIS POS Z108 | Terminal de Paiement</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Écran de connexion -->
+        <div id="login-screen" class="screen active">
+            <div class="login-container">
+                <div class="pos-brand">
+                    <div class="brand-icon">🏪</div>
+                    <h1>CREALIS POS</h1>
+                    <p>Terminal Z108</p>
+                </div>
+                <div class="login-form">
+                    <input type="text" id="merchant-code" placeholder="Code commerçant" class="pos-input">
+                    <input type="password" id="pos-pin" placeholder="Code PIN" class="pos-input">
+                    <button id="login-btn" class="pos-btn primary">🔓 DÉMARRER</button>
+                </div>
+                <div class="pos-status">
+                    <span class="status-dot online"></span> Connecté
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran principal (Caisse) -->
+        <div id="cashier-screen" class="screen">
+            <div class="pos-header">
+                <div class="merchant-info">
+                    <span id="merchant-name">Chargement...</span>
+                    <small id="merchant-location"></small>
+                </div>
+                <div class="pos-time">
+                    <span id="current-time">--:--</span>
+                    <span id="battery-level">🔋 100%</span>
+                </div>
+            </div>
+
+            <!-- Barre de recherche / scan -->
+            <div class="search-section">
+                <div class="scan-methods">
+                    <button id="scan-barcode-btn" class="scan-btn barcode">📷 Scanner Code-barres</button>
+                    <button id="scan-qr-btn" class="scan-btn qr">📱 Scanner QR Code</button>
+                    <button id="manual-entry-btn" class="scan-btn manual">⌨️ Saisie manuelle</button>
+                </div>
+                <div class="customer-info-bar" id="customer-info-bar" style="display: none;">
+                    <div class="customer-badge">
+                        <span id="customer-name">Client</span>
+                        <span id="customer-points">0 pts</span>
+                    </div>
+                    <button id="clear-customer" class="clear-btn">✕</button>
+                </div>
+            </div>
+
+            <!-- Layout principal: Produits à gauche, Panier à droite -->
+            <div class="main-layout">
+                <!-- Section des produits disponibles -->
+                <div class="products-section">
+                    <div class="section-header">
+                        <h3>📦 Produits disponibles</h3>
+                        <input type="text" id="product-search" placeholder="🔍 Rechercher..."
+                            class="search-input-small">
+                    </div>
+                    <div id="products-container" class="products-container"></div>
+                </div>
+
+                <!-- Section du panier -->
+                <div class="cart-section">
+                    <div class="cart-header">
+                        <h3>🛒 Panier</h3>
+                        <span id="item-count" class="cart-badge">0</span>
+                    </div>
+                    <div id="cart-items" class="cart-items"></div>
+                    <div class="cart-total">
+                        <div class="total-label">TOTAL</div>
+                        <div id="cart-total-amount" class="total-amount">0 FCFA</div>
+                    </div>
+                    <button id="checkout-btn" class="checkout-btn">💳 PAYER</button>
+                </div>
+            </div>
+
+            <!-- Scanner Modal -->
+            <div id="scanner-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span>📷 Scanner</span>
+                        <button class="modal-close" onclick="closeScannerModal()">&times;</button>
+                    </div>
+                    <div class="scanner-container">
+                        <video id="scanner-video" style="width: 100%; border-radius: 10px;"></video>
+                        <canvas id="scanner-canvas" style="display: none;"></canvas>
+                        <div id="scanner-result" class="scanner-result"></div>
+                        <div class="scanner-actions">
+                            <button id="toggle-torch" class="scanner-btn">🔦 Lampe</button>
+                            <button id="switch-camera" class="scanner-btn">🔄 Changer caméra</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal NFC (simulé) -->
+            <div id="nfc-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span>💳 Lecture NFC</span>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="nfc-reader">
+                        <div class="nfc-animation">💳</div>
+                        <p>Approchez la carte du lecteur</p>
+                        <div id="nfc-status">En attente...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toast notifications -->
+            <div id="toast-container" class="toast-container"></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>

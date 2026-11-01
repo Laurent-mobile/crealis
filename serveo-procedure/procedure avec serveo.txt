@@ -1,0 +1,515 @@
+Parfait ! Serveo.net est une excellente alternative gratuite qui permet d'avoir plusieurs tunnels simultanément. Voici comment l'utiliser :
+
+Installation et utilisation de Serveo
+Serveo ne nécessite aucune installation ! Il utilise SSH directement depuis PowerShell.
+
+Étape 1 : Démarrer le backend localement
+powershell
+# Terminal 1 - Démarrer le backend
+cd C:\MesApplications\CREALIS2\backend
+npm run dev
+Étape 2 : Démarrer le frontend localement
+powershell
+# Terminal 2 - Démarrer le frontend
+cd C:\MesApplications\CREALIS2\frontend-web
+npm run dev
+Étape 3 : Créer un tunnel pour le backend (nouveau terminal)
+powershell
+# Terminal 3 - Tunnel pour le backend sur le port 5000
+ssh -R 80:localhost:5000 serveo.net
+Important : La première fois, on vous demandera de confirmer la connexion. Tapez yes et Entrée.
+
+Serveo vous donnera une URL comme : https://xxx.serveo.net
+
+📌 COPIEZ CETTE URL pour le backend
+
+Étape 4 : Créer un tunnel pour le frontend (autre nouveau terminal)
+powershell
+# Terminal 4 - Tunnel pour le frontend sur le port 3001
+ssh -R 80:localhost:3001 serveo.net
+Serveo vous donnera une autre URL : https://yyy.serveo.net
+
+📌 COPIEZ CETTE URL pour le frontend
+
+Étape 5 : Obtenir des URLs personnalisées (optionnel)
+powershell
+# Pour avoir une URL personnalisée pour le backend
+ssh -R crealis-api:80:localhost:5000 serveo.net
+# URL: https://crealis-api.serveo.net
+
+# Pour avoir une URL personnalisée pour le frontend
+ssh -R crealis-market:80:localhost:3001 serveo.net
+# URL: https://crealis-market.serveo.net
+Étape 6 : Configurer le frontend pour utiliser l'API distante
+Modifiez frontend-web/src/api.js :
+
+javascript
+import axios from 'axios';
+
+// Configuration Serveo
+// REMPLACEZ par votre URL Serveo du backend
+const SERVER_API_URL = 'https://crealis-api.serveo.net/api';
+
+const getApiUrl = () => {
+    // Si on est sur l'URL Serveo du frontend
+    if (window.location.hostname.includes('serveo.net')) {
+        return SERVER_API_URL;
+    }
+    // En développement local
+    return 'http://localhost:5000/api';
+};
+
+const API_URL = getApiUrl();
+console.log('🔧 API URL:', API_URL);
+
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    timeout: 30000,
+});
+
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers['x-auth-token'] = token;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+export default api;
+Étape 7 : Partager les liens
+Partagez l'URL du frontend : https://crealis-market.serveo.net
+
+Le backend : https://crealis-api.serveo.net (pour référence)
+
+Dépannage Serveo
+Si la commande SSH ne fonctionne pas
+powershell
+# Activer SSH client dans Windows
+# Aller dans : Paramètres > Applications > Fonctionnalités optionnelles
+# Ajouter "Client SSH"
+
+# Ou utiliser une alternative avec curl
+curl -s http://serveo.net:80/localhost:5000
+Pour garder les tunnels actifs
+powershell
+# Utiliser autossh pour garder la connexion active
+# Installer autossh via WSL ou Git Bash
+autossh -M 0 -R 80:localhost:5000 serveo.net
+Si les ports sont bloqués
+powershell
+# Utiliser un port différent
+ssh -R 80:localhost:5000 serveo.net -p 22
+
+# Utiliser le port HTTPS
+ssh -R 443:localhost:5000 serveo.net
+Avantages de Serveo
+Fonctionnalité	Serveo	ngrok
+✅ Gratuit	Oui	Limité
+✅ Plusieurs tunnels	Oui	Non (gratuit)
+✅ URLs personnalisables	Oui	Non (gratuit)
+✅ Installation	Aucune	Nécessite
+✅ Sous-domaines	Oui	Non (gratuit)
+Résumé des commandes
+powershell
+# 1. Backend
+ssh -R 80:localhost:5000 serveo.net
+# Obtient: https://xxx.serveo.net
+
+# 2. Frontend
+ssh -R 80:localhost:3001 serveo.net
+# Obtient: https://yyy.serveo.net
+
+# 3. URLs personnalisées
+ssh -R crealis-api:80:localhost:5000 serveo.net
+ssh -R crealis-market:80:localhost:3001 serveo.net
+C'est parti ! Avec Serveo, vous pouvez avoir vos deux tunnels gratuits et fonctionnels.
+
+Windows PowerShell
+Copyright (C) Microsoft Corporation. Tous droits réservés.
+
+Installez la dernière version de PowerShell pour de nouvelles fonctionnalités et améliorations ! https://aka.ms/PSWindows
+
+PS C:\Users\Hp> # Terminal 4 - Tunnel pour le frontend sur le port 3001
+PS C:\Users\Hp> ssh -R 80:localhost:3001 serveo.net
+Forwarding HTTP traffic from https://c6e136ef14e35658-102-178-16-122.serveousercontent.com
+Windows PowerShell
+Copyright (C) Microsoft Corporation. Tous droits réservés.
+
+Installez la dernière version de PowerShell pour de nouvelles fonctionnalités et améliorations ! https://aka.ms/PSWindows
+
+PS C:\Users\Hp> # Terminal 3 - Tunnel pour le backend sur le port 5000
+PS C:\Users\Hp> ssh -R 80:localhost:5000 serveo.net
+The authenticity of host 'serveo.net (5.255.123.12)' can't be established.
+RSA key fingerprint is SHA256:07jcXlJ4SkBnyTmaVnmTpXuBiRx2+Q2adxbttO9gt0M.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'serveo.net,5.255.123.12' (RSA) to the list of known hosts.
+Forwarding HTTP traffic from https://ee698ee2319bcb9f-102-178-16-122.serveousercontent.com
+Tip (1): Create an account to reserve names. Pro removes the warning page: https://console.serveo.net/settings?n=1&src=ssh_nudge&v=B
+🎉 Félicitations ! Vos tunnels Serveo sont actifs !
+
+Vous avez maintenant deux URLs :
+
+Vos URLs Serveo
+Backend : https://ee698ee2319bcb9f-102-178-16-122.serveousercontent.com
+
+Frontend : https://c6e136ef14e35658-102-178-16-122.serveousercontent.com
+
+Prochaine étape : Configurer le frontend
+1. Modifiez frontend-web/src/api.js
+javascript
+import axios from 'axios';
+
+// Configuration Serveo avec vos URLs
+const BACKEND_URL = 'https://ee698ee2319bcb9f-102-178-16-122.serveousercontent.com';
+const LOCAL_URL = 'http://localhost:5000';
+
+const getApiUrl = () => {
+    const hostname = window.location.hostname;
+    
+    // Si on est sur l'URL Serveo du frontend
+    if (hostname.includes('serveousercontent.com')) {
+        return `${BACKEND_URL}/api`;
+    }
+    
+    // En développement local
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';
+    }
+    
+    return 'http://localhost:5000/api';
+};
+
+const API_URL = getApiUrl();
+console.log('🔧 API URL:', API_URL);
+
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    timeout: 30000,
+});
+
+// Intercepteur pour ajouter le token
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers['x-auth-token'] = token;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+export default api;
+2. Redémarrez le frontend
+powershell
+# Dans le terminal du frontend, arrêtez (Ctrl+C) puis relancez
+npm run dev
+3. Testez l'application
+Ouvrez l'URL du frontend : https://c6e136ef14e35658-102-178-16-122.serveousercontent.com
+
+Connectez-vous avec vos identifiants (ex: master@crealis.com / admin123)
+
+Conseils importants
+Pour garder les tunnels actifs
+Les tunnels Serveo restent actifs tant que la connexion SSH est ouverte. Ne fermez pas ces fenêtres PowerShell.
+
+Créer un compte Serveo (optionnel pour éviter la page d'avertissement)
+powershell
+# Aller sur https://console.serveo.net/settings?n=1&src=ssh_nudge&v=B
+# Créer un compte gratuit
+# Ensuite, utiliser ssh avec votre clé privée
+Si vous voulez des URLs plus simples
+powershell
+# Arrêter les tunnels actuels (Ctrl+C)
+# Lancer avec des noms personnalisés
+ssh -R crealis-backend:80:localhost:5000 serveo.net
+ssh -R crealis-market:80:localhost:3001 serveo.net
+URLs à partager avec les testeurs
+Partagez uniquement l'URL du frontend :
+https://c6e136ef14e35658-102-178-16-122.serveousercontent.com
+
+Le backend est automatiquement accessible via cette URL pour les appels API.
+
+Vérification
+Dans la console navigateur (F12) de votre application, vous devriez voir :
+
+text
+🔧 API URL: https://ee698ee2319bcb9f-102-178-16-122.serveousercontent.com/api
+Cela confirme que le frontend communique bien avec le backend via Serveo !
+
+Maintenant partagez votre URL avec vos testeurs ! 🚀
+
+Blocked request. This host ("c6e136ef14e35658-102-178-16-122.serveousercontent.com") is not allowed.
+To allow this host, add "c6e136ef14e35658-102-178-16-122.serveousercontent.com" to `server.allowedHosts` in vite.config.js.
+Voici comment corriger cette erreur dans Vite :
+
+Correction de frontend-web/vite.config.js
+javascript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3001,
+    host: true,
+    allowedHosts: [
+      'localhost',
+      '.serveousercontent.com',  // Autorise tous les sous-domaines Serveo
+      'c6e136ef14e35658-102-178-16-122.serveousercontent.com'  // Votre URL spécifique
+    ],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  }
+})
+Redémarrez le frontend
+powershell
+# Dans le terminal du frontend, arrêtez (Ctrl+C) puis :
+npm run dev
+Si l'erreur persiste, version plus permissive :
+javascript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3001,
+    host: true,
+    allowedHosts: 'all',  // ⚠️ Accepte tous les hôtes (pour les tests uniquement)
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  }
+})
+Redémarrez le frontend après modification
+bash
+npm run dev
+Maintenant votre application devrait être accessible via l'URL Serveo sans l'erreur de blocage.
+
+maintenant la connexion réussie mais je ne passe pas la page de connexion
+Le problème vient du fait que le token est bien stocké mais la redirection ne fonctionne pas à cause de l'URL Serveo. Voici la correction :
+
+Corriger Login.jsx - Problème de redirection
+jsx
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import api from '../api'
+import toast from 'react-hot-toast'
+
+function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const response = await api.post('/auth/login', { email, password })
+      console.log('Login response:', response.data)
+      
+      // Stocker le token et l'utilisateur
+      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data.user))
+      
+      // Vérifier que le token est bien stocké
+      const token = localStorage.getItem('token')
+      console.log('Token stored:', token ? 'Yes' : 'No')
+      
+      toast.success('Connexion réussie')
+      
+      // Forcer la redirection
+      window.location.href = '/'
+      
+    } catch (error) {
+      console.error('Login error:', error)
+      toast.error('Email ou mot de passe incorrect')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="login-container">
+      <div className="login-bg">
+        <div className="login-bg-overlay"></div>
+        <div className="login-bg-particles">
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+        </div>
+      </div>
+
+      <div className="login-card">
+        <div className="login-header">
+          <div className="login-logo">
+            <div className="logo-icon-large">🏪</div>
+            <div className="logo-text-large">
+              <span className="logo-main">CREALIS</span>
+              <span className="logo-sub">DASSANDAGA</span>
+            </div>
+          </div>
+          <p className="login-subtitle">Plateforme de gestion intelligente</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="input-group">
+            <div className="input-icon">📧</div>
+            <input
+              type="email"
+              className="login-input"
+              placeholder="Adresse email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <div className="input-icon">🔒</div>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              className="login-input"
+              placeholder="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button 
+              type="button" 
+              className="password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? '👁️' : '👁️‍🗨️'}
+            </button>
+          </div>
+
+          <div className="login-options">
+            <label className="checkbox-label">
+              <input type="checkbox" /> 
+              <span>Se souvenir de moi</span>
+            </label>
+            <a href="#" className="forgot-link">Mot de passe oublié ?</a>
+          </div>
+
+          <button 
+            type="submit" 
+            className="login-btn"
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="btn-spinner"></span>
+            ) : (
+              <>
+                <span>Se connecter</span>
+                <span className="btn-icon">→</span>
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="login-footer">
+          <div className="login-features">
+            <div className="feature">
+              <span className="feature-icon">📊</span>
+              <span>Dashboard en temps réel</span>
+            </div>
+            <div className="feature">
+              <span className="feature-icon">💳</span>
+              <span>Gestion des fidélités</span>
+            </div>
+            <div className="feature">
+              <span className="feature-icon">📱</span>
+              <span>Terminaux POS connectés</span>
+            </div>
+          </div>
+          <p className="login-copyright">
+            © 2025 CREALIS-DASSANDAGA - Tous droits réservés
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Login
+Corriger App.jsx - Vérification d'authentification
+jsx
+import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Dashboard from './pages/Dashboard'
+import Merchants from './pages/Merchants'
+import Transactions from './pages/Transactions'
+import Loyalty from './pages/Loyalty'
+import Customers from './pages/Customers'
+import Products from './pages/Products'
+import Warehouse from './pages/Warehouse'
+import POS from './pages/POS'
+import Advertising from './pages/Advertising'
+import Reports from './pages/Reports'
+import Settings from './pages/Settings'
+import Login from './pages/Login'
+
+function App() {
+  // Vérification plus robuste
+  const token = localStorage.getItem('token')
+  const isAuthenticated = token !== null && token !== 'undefined' && token !== ''
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/merchants" element={isAuthenticated ? <Merchants /> : <Navigate to="/login" />} />
+        <Route path="/transactions" element={isAuthenticated ? <Transactions /> : <Navigate to="/login" />} />
+        <Route path="/loyalty" element={isAuthenticated ? <Loyalty /> : <Navigate to="/login" />} />
+        <Route path="/customers" element={isAuthenticated ? <Customers /> : <Navigate to="/login" />} />
+        <Route path="/products" element={isAuthenticated ? <Products /> : <Navigate to="/login" />} />
+        <Route path="/warehouse" element={isAuthenticated ? <Warehouse /> : <Navigate to="/login" />} />
+        <Route path="/pos" element={isAuthenticated ? <POS /> : <Navigate to="/login" />} />
+        <Route path="/advertising" element={isAuthenticated ? <Advertising /> : <Navigate to="/login" />} />
+        <Route path="/reports" element={isAuthenticated ? <Reports /> : <Navigate to="/login" />} />
+        <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App
+Redémarrez le frontend
+bash
+npm run dev
+Si le problème persiste, testez dans la console navigateur (F12) :
+javascript
+// Vérifier le token après connexion
+console.log('Token:', localStorage.getItem('token'))
+console.log('User:', localStorage.getItem('user'))
+
+// Tester la redirection manuelle
+window.location.href = '/'
+La solution utilise window.location.href = '/' qui force une navigation complète, évitant les problèmes de routing avec les URLs Serveo.

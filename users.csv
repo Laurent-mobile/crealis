@@ -1,0 +1,2 @@
+id,phone,full_name,hashed_pin,role,tenant_id,is_active,created_at
+usr_8bc2f7ea71d947748da4d815bde1b269,+22670000000,Client TEST,$2b$12$4HSdSCnfgN.5pIRkNirmSOv3CdUuz7YcEfWB7ZcCr34hBdJUVZdDG,client,crealis,t,2026-05-28 16:46:11.817341

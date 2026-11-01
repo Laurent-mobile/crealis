@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CREALIS POS Z108</string>
+    <string name="title_activity_main">CREALIS POS Z108</string>
+    <string name="package_name">com.crealis.pos.z108</string>
+    <string name="custom_url_scheme">com.crealis.pos.z108</string>
+</resources>
