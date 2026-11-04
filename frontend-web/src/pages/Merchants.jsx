@@ -255,16 +255,16 @@ function Merchants() {
 
   if (loading) {
     return (
-      
+      <>
         <div className="spinner-container">
           <div className="spinner"></div>
         </div>
-      
+      </>
     )
   }
 
   return (
-    
+    <>
       <div className="page-container">
         <div className="page-header">
           <div>
@@ -696,7 +696,7 @@ function Merchants() {
           </div>
         )}
       </div>
-    
+    </>
   )
 }
 

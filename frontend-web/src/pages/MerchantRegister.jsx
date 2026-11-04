@@ -118,7 +118,7 @@ function MerchantRegister() {
             <div className="register-card">
                 <div className="register-header">
                     <div className="register-logo">
-                        <img src="/src/assets/logo.jpg" alt="Créalis" className="logo-image-large" />
+                        <img src="/logo.jpg" alt="Créalis" className="logo-image-large" />
                         <div className="logo-text-large">
                             <span className="logo-main">{companyName}</span>
                             <span className="logo-sub">DASSANDAGA</span>

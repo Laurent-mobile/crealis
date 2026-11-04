@@ -124,15 +124,15 @@ function MerchantStockRequests() {
 
     if (loading) {
         return (
-            <Layout>
+            <>
                 <div className="spinner-container"><div className="spinner"></div></div>
-            </Layout>
+            </>
         );
     }
 
     // ✅ CORRECTION ICI : Ajout des balises <Layout> et </Layout> qui manquaient
     return (
-        <Layout>
+        <>
             <div className="page-container">
                 <div className="page-header">
                     <div>
@@ -472,7 +472,7 @@ function MerchantStockRequests() {
                 .info-box { display: flex; align-items: center; gap: 12px; background: #e0e7ff; padding: 12px; border-radius: 8px; margin-top: 16px; font-size: 13px; color: #1e40af; }
                 .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
             `}</style>
-        </Layout>
+        </>
     );
 }
 

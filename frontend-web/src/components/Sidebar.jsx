@@ -71,7 +71,7 @@ const Sidebar = () => {
         <aside className="sidebar">
             <div className="sidebar-header">
                 <div className="sidebar-logo">
-                    <img src="/src/assets/logo.jpg" alt="Créalis" className="logo-image" />
+                    <img src="/logo.jpg" alt="Créalis" className="logo-image-large" />
                     <div className="logo-text">
                         <span className="logo-main">{companyName}</span>
                         <span className="logo-sub">DASSANDAGA</span>

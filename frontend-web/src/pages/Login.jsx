@@ -55,7 +55,7 @@ function Login() {
       <div className="login-card">
         <div className="login-header">
           <div className="login-logo">
-            <img src="/src/assets/logo.jpg" alt="Créalis" className="logo-image-large" />
+            <img src="/logo.jpg" alt="Créalis" className="logo-image-large" />
             <div className="logo-text-large">
               <span className="logo-main">CREALIS</span>
               <span className="logo-sub">DASSANDAGA</span>
