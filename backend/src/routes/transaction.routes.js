@@ -209,8 +209,7 @@ router.post('/recharge', auth, async (req, res) => {
   }
 });
 
-// ==================== ACHAT VIA POS (AVEC ITEMS) ====================
-// ✅ ROUTE CORRIGÉE - Utilise le tableau items pour déduire le stock correctement
+// ==================== ACHAT VIA POS (CORRIGÉ : DÉDUCTION DU WALLET) ====================
 router.post('/purchase', auth, async (req, res) => {
   try {
     const { amount, merchantId, customerId, description, paymentMethod, items } = req.body;
@@ -218,29 +217,26 @@ router.post('/purchase', auth, async (req, res) => {
 
     console.log('🛒 Purchase request:', { amount, merchantId, customerId, paymentMethod, items });
 
-    // Validation
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ message: 'Montant invalide' });
-    }
-    if (!merchantId) {
-      return res.status(400).json({ message: 'Commerçant requis' });
-    }
+    if (!amount || amount <= 0) return res.status(400).json({ message: 'Montant invalide' });
+    if (!merchantId) return res.status(400).json({ message: 'Commerçant requis' });
 
-    // Récupérer le client (si fourni)
+    // 1. Récupérer le client
     let customer = null;
     if (customerId) {
-      const { data: customerData, error: customerError } = await supabase
-        .from('Customers')
-        .select('*')
-        .eq('id', customerId)
-        .single();
+      const { data: customerData } = await supabase.from('Customers').select('*').eq('id', customerId).single();
+      if (customerData) customer = customerData;
+    }
 
-      if (!customerError && customerData) {
-        customer = customerData;
+    // Si pas de customerId, on essaie de le trouver via l'utilisateur connecté
+    if (!customer) {
+      const { data: userData } = await supabase.from('Users').select('phone').eq('id', userId).single();
+      if (userData) {
+        const { data: custData } = await supabase.from('Customers').select('*').eq('phoneNumber', userData.phone).single();
+        customer = custData;
       }
     }
 
-    // Récupérer le commerçant
+    // 2. Récupérer le commerçant
     const { data: merchant, error: merchantError } = await supabase
       .from('Merchants')
       .select('*')
@@ -248,15 +244,27 @@ router.post('/purchase', auth, async (req, res) => {
       .single();
 
     if (merchantError || !merchant) {
-      console.error('Merchant not found:', merchantError);
       return res.status(404).json({ message: 'Commerçant non trouvé' });
     }
 
-    // Calculer les points (1 point par 100 FCFA)
+    // 3. ✅ CORRECTION : Vérification et déduction du solde si paiement par wallet
+    let newWalletBalance = customer ? (customer.walletBalance || 0) : 0;
+    if (paymentMethod === 'wallet') {
+      if (newWalletBalance < amount) {
+        return res.status(400).json({ 
+          message: 'Solde insuffisant', 
+          balance: newWalletBalance, 
+          required: amount 
+        });
+      }
+      newWalletBalance -= amount; // On déduit le montant du solde
+    }
+
+    // 4. Calcul des points
     const pointsEarned = Math.floor(amount / 100);
     const transactionIdValue = `POS_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
-    // Créer la transaction
+    // 5. Créer la transaction
     const { data: transaction, error: txError } = await supabase
       .from('Transactions')
       .insert({
@@ -277,91 +285,55 @@ router.post('/purchase', auth, async (req, res) => {
       .select()
       .single();
 
-    if (txError) {
-      console.error('Transaction insert error:', txError);
-      throw txError;
-    }
+    if (txError) throw txError;
 
-    // Mettre à jour le client si existant
+    // 6. ✅ CORRECTION : Mettre à jour le client (Solde, Points, Total dépensé, VIP)
     if (customer) {
       const newTotalSpent = (customer.totalSpent || 0) + amount;
       const newPoints = (customer.loyaltyPoints || 0) + pointsEarned;
 
-      let vipLevel = customer.vipLevel;
+      let vipLevel = customer.vipLevel || 'bronze';
       if (newPoints >= 10000) vipLevel = 'platinum';
       else if (newPoints >= 5000) vipLevel = 'gold';
       else if (newPoints >= 2000) vipLevel = 'silver';
 
-      const { error: updateError } = await supabase
-        .from('Customers')
-        .update({
-          totalSpent: newTotalSpent,
-          loyaltyPoints: newPoints,
-          vipLevel: vipLevel,
-          updatedAt: new Date().toISOString()
-        })
-        .eq('id', customer.id);
+      const updateData = {
+        totalSpent: newTotalSpent,
+        loyaltyPoints: newPoints,
+        vipLevel: vipLevel,
+        updatedAt: new Date().toISOString()
+      };
 
-      if (updateError) {
-        console.error('Customer update error:', updateError);
+      // ✅ C'est ici que le solde était oublié ! On l'ajoute :
+      if (paymentMethod === 'wallet') {
+        updateData.walletBalance = newWalletBalance;
       }
+
+      await supabase.from('Customers').update(updateData).eq('id', customer.id);
 
       // Historique des points
-      await supabase
-        .from('PointsHistory')
-        .insert({
-          customer_id: customer.id,
-          points: pointsEarned,
-          type: 'earned',
-          reason: `Achat de ${amount.toLocaleString()} FCFA chez ${merchant.name}`,
-          transaction_id: transactionIdValue,
-          created_at: new Date().toISOString()
-        });
+      await supabase.from('PointsHistory').insert({
+        customer_id: customer.id,
+        points: pointsEarned,
+        type: 'earned',
+        reason: `Achat de ${amount.toLocaleString()} FCFA chez ${merchant.name}`,
+        transaction_id: transactionIdValue,
+        created_at: new Date().toISOString()
+      });
     }
 
-    // ✅ CORRECTION MAJEURE : Mettre à jour le stock des produits
-    // On parcourt le tableau items et on déduit la QUANTITÉ RÉELLE
+    // 7. Mettre à jour le stock des produits (si tableau items fourni)
     if (items && Array.isArray(items) && items.length > 0) {
-      console.log(`📦 Mise à jour du stock pour ${items.length} produit(s)`);
-
       for (const item of items) {
-        if (!item.productId) continue;
-
-        // Récupérer le produit
-        const { data: product, error: productError } = await supabase
-          .from('Products')
-          .select('id, name, stock, merchant_id')
-          .eq('id', item.productId)
-          .single();
-
-        if (productError || !product) {
-          console.log(`⚠️ Produit non trouvé: ${item.productId}`);
-          continue;
-        }
-
-        // ✅ Utiliser la quantité réelle au lieu de -1
-        const quantityToDeduct = parseInt(item.quantity) || 1;
-        const currentStock = product.stock || 0;
-        const newStock = Math.max(0, currentStock - quantityToDeduct);
-
-        console.log(`📉 ${product.name}: ${currentStock} → ${newStock} (quantité: ${quantityToDeduct})`);
-
-        const { error: updateStockError } = await supabase
-          .from('Products')
-          .update({
-            stock: newStock,
-            lastStockUpdate: new Date().toISOString()
-          })
-          .eq('id', product.id);
-
-        if (updateStockError) {
-          console.error(`❌ Erreur mise à jour stock pour ${product.name}:`, updateStockError);
-        } else {
-          console.log(`✅ Stock mis à jour: ${product.name} → ${newStock}`);
+        if (item.productId) {
+          const { data: product } = await supabase.from('Products').select('id, stock').eq('id', item.productId).single();
+          if (product) {
+            const quantityToDeduct = parseInt(item.quantity) || 1;
+            const newStock = Math.max(0, (product.stock || 0) - quantityToDeduct);
+            await supabase.from('Products').update({ stock: newStock, lastStockUpdate: new Date().toISOString() }).eq('id', product.id);
+          }
         }
       }
-    } else {
-      console.log('⚠️ Aucun item fourni, le stock ne sera pas mis à jour');
     }
 
     res.status(201).json({
@@ -371,6 +343,7 @@ router.post('/purchase', auth, async (req, res) => {
         id: transactionIdValue,
         amount: amount,
         pointsEarned: pointsEarned,
+        newBalance: paymentMethod === 'wallet' ? newWalletBalance : (customer ? customer.walletBalance : 0),
         merchant: merchant.name,
         date: new Date().toISOString()
       }
