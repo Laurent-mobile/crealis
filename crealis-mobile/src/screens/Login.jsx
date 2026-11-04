@@ -11,6 +11,7 @@ import {
     ActivityIndicator,
     Alert,
     ScrollView,
+    Image,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
@@ -43,7 +44,11 @@ export default function Login({ navigation }) {
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <Text style={styles.logo}>🏪</Text>
+                    <Image
+    source={require('../../assets/logo.jpg')} // Assurez-vous que le chemin est correct
+    style={styles.logoImage}
+    resizeMode="contain"
+  />
                     <Text style={styles.title}>CREALIS</Text>
                     <Text style={styles.subtitle}>DASSANDAGA</Text>
                     <Text style={styles.welcome}>Bienvenue !</Text>
@@ -132,6 +137,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#2563eb',
     },
+    logoImage: { // ← AJOUTEZ CE STYLE
+    width: 120, // Ajustez la taille selon votre logo
+    height: 120,
+    marginBottom: 10,
+  },
     subtitle: {
         fontSize: 12,
         color: '#f59e0b',

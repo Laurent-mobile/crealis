@@ -49,11 +49,10 @@ export default function MapViewComponent({
             </div>
             <script>
                 const map = L.map('map').setView([${lat}, ${lng}], 14);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; OpenStreetMap, &copy; CARTO',
-                    subdomains: 'abcd',
-                    maxZoom: 20
-                }).addTo(map);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  maxZoom: 19
+}).addTo(map);
 
                 // Ajouter les marqueurs commerçants
                 const markers = [${markers.map(m => `{

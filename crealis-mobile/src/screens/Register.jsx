@@ -11,6 +11,7 @@ import {
     ActivityIndicator,
     Alert,
     ScrollView,
+    Image,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
@@ -71,7 +72,11 @@ export default function Register({ navigation }) {
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <Text style={styles.logo}>🏪</Text>
+                    <Image
+                        source={require('../../assets/logo.jpg')}
+                        style={styles.logoImage}
+                        resizeMode="contain"
+                    />
                     <Text style={styles.title}>CREALIS</Text>
                     <Text style={styles.subtitle}>Créez votre compte</Text>
                 </View>
@@ -188,6 +193,11 @@ const styles = StyleSheet.create({
         fontSize: 50,
         marginBottom: 10,
     },
+    logoImage: { // ← AJOUTEZ CE STYLE
+    width: 100, // Ajustez la taille selon votre logo
+    height: 100,
+    marginBottom: 10,
+  },
     title: {
         fontSize: 24,
         fontWeight: 'bold',

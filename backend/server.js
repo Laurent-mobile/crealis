@@ -62,15 +62,14 @@ const allowedOrigins = isProd
   : ['http://localhost:5173', 'http://localhost:3000'];
 
 app.use(cors({
-  origin: function(origin, callback) {
-    // Autoriser les requêtes sans origine (ex: mobile, tests) ou celles dans la liste
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('❌ Requête CORS bloquée pour:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: [
+    'http://localhost:5173',      // Vite (Frontend Web)
+    'http://localhost:3000',      // Autre port frontend possible
+    'http://localhost:8081',      // ✅ Expo Web (Mobile)
+    'http://localhost:19006',     // ✅ Expo Web (Port alternatif)
+    'https://crealis-dashboard.vercel.app',
+    'https://crealis-dashbord.vercel.app'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token', 'ngrok-skip-browser-warning'],
   credentials: true
